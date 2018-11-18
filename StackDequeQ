@@ -1,0 +1,676 @@
+
+#include "stdafx.h" 
+#include <stdio.h> 
+#include <locale.h> 
+#include <conio.h> 
+#include <iostream> 
+#include <string> 
+
+using namespace std;
+
+//---------------------------------------------------------------------
+//----------------------------Cтэк-------------------------------------
+//---------------------------------------------------------------------
+
+
+class Stack
+{
+public:
+	void push(Stack **, int, char *, char *);
+	void view(Stack **);
+	void view_d(Stack **, char*);
+	void del(Stack **top, int);
+
+
+	int price;
+	char familia[100];
+	char model[50];
+
+	Stack *next;
+	Stack **top;
+};
+
+
+//функция добавления в стек 
+void Stack::push(Stack **top, int price, char*familia, char*model)
+{
+	Stack *new_item;
+	new_item = new Stack;
+	new_item->price = price;
+	strcpy(new_item->familia, familia);
+	strcpy(new_item->model, model);
+
+	new_item->next = *top;
+	*top = new_item;
+}
+
+//функция просмотра стека 
+void Stack::view(Stack **q)
+{
+	int flag2 = 0;
+	Stack *tp = *q;
+	while (tp)
+	{
+		flag2 = 1;
+		std::cout <<tp->price << "\t\t" << tp->familia << "\t\t\t" << tp->model << "\n";
+		tp = tp->next;
+	}
+	if (flag2 == 0) printf("\nStack is empty! \n");
+}
+
+// функция просмотра по введенной фамилии 
+void Stack::view_d(Stack **q, char* fam)
+{
+	Stack *t3 = *q;
+	while (t3)
+
+	{
+		if (strcmp(t3->familia, fam) == 0)
+		{
+			std::cout << t3->price << "\t\t\t" << t3->familia << "\t" << t3->model << "\n";
+		}
+		t3 = t3->next;
+	}
+}
+
+//функция удаления элемента из стека 
+void Stack::del(Stack **pbeg, int num)
+{
+	int flag4 = 0;
+	if (*pbeg)
+	{
+		Stack *current = *pbeg;
+		Stack *previous = 0;
+
+		//удаление в начале стека 
+		if (current == *pbeg)
+		{
+			*pbeg = (*pbeg)->next;
+			flag4 = 1;
+		}
+
+
+		previous = current;
+		current = current->next;
+
+
+		if (flag4 == 1) printf("\nDeleted! \n");
+	}
+	else
+	{
+		printf("\nStack is empty! \n");
+	}
+}
+
+
+//---------------------------------------------------------------------
+//-----------------------------Очередь---------------------------------
+//---------------------------------------------------------------------
+
+
+class Que 
+{
+public :
+	void push(Que **top, Que ** ends, int price, char*familia, char*model);
+	void view(Que **q);
+	void view_s(Que **q, char* fam);
+	void del(Que **pbeg);
+
+	int price;
+	char familia[100];
+	char model[50];
+
+	Que *next;
+	Que **top;
+	Que *ends;
+};
+
+//Добавление в очередь
+void Que::push(Que **top, Que **ends, int price, char*familia, char*model)
+{
+	Que *new_item;
+	new_item = new Que;
+	new_item->price = price;
+	strcpy(new_item->familia, familia);
+	strcpy(new_item->model, model);
+	if (*top) {
+		
+		int flag01 = 0;
+		Que *tp = *top;
+		while (tp)
+		{
+			if (tp == *ends) {
+				new_item->next = 0;
+				tp->next = new_item;
+				*ends = new_item;
+				break;
+			}
+
+			tp = tp->next;
+		}
+
+		//new_item->next = *top;
+		//*top = new_item;
+
+	}
+	else {
+
+		new_item->next = *top;
+		*ends = new_item;
+		*top = new_item;
+	}
+}
+
+// Вывод всей очереди 
+void Que::view(Que **q)
+{
+	int flag2 = 0;
+	Que *tp = *q;
+	while (tp)
+	{
+		flag2 = 1;
+		std::cout << tp->price << "\t\t" << tp->familia << "\t\t\t" << tp->model << "\n";
+		tp = tp->next;
+	}
+	if (flag2 == 0) printf("\nStack is empty! \n");
+}
+
+// Удаление из очереди 
+void Que::del(Que **pbeg)
+{
+	int flag4 = 0;
+	if (*pbeg)
+	{
+		Que *current = *pbeg;
+		Que *previous = 0;
+
+		//удаление в начале стека 
+		if (current == *pbeg)
+		{
+			*pbeg = (*pbeg)->next;
+			flag4 = 1;
+		}
+
+
+		previous = current;
+		current = current->next;
+
+
+		if (flag4 == 1) printf("\nDeleted! \n");
+	}
+	else
+	{
+
+		printf("\nQueue is empty! \n");
+	}
+}
+
+//Поиск по фамилии 
+void Que::view_s(Que **q, char* fam)
+{
+	Que *t3 = *q;
+	while (t3)
+
+	{
+		if (strcmp(t3->familia, fam) == 0)
+		{
+			std::cout << t3->price << "\t\t\t" << t3->familia << "\t" << t3->model << "\n";
+		}
+		t3 = t3->next;
+	}
+}
+
+
+//---------------------------------------------------------------------
+//-----------------------------Дэк-------------------------------------
+//---------------------------------------------------------------------
+
+
+class Deque
+{
+public:
+	void push_h(Deque **top, Deque **ends, int price, char*familia, char*model);
+	void push_f(Deque **top, Deque **ends, int price, char*familia, char*model);
+	void del_h(Deque **pbeg);
+	void del_f(Deque **pbeg, Deque **ends);
+	void view(Deque **q);
+	void search(Deque **q, char* fam);
+
+	int price;
+	char familia[100];
+	char model[50];
+	
+	Deque *next;
+	Deque **top;
+	Deque *ends;
+};
+
+//Добавление элемента Дэка в начало
+void Deque::push_h(Deque **top, Deque **ends, int price, char*familia, char*model)
+{
+	Deque *new_item;
+	new_item = new Deque;
+	new_item->price = price;
+	strcpy(new_item->familia, familia);
+	strcpy(new_item->model, model);
+	if (*top) {
+
+		new_item->next = *top;
+		*top = new_item;
+
+
+	}
+	else {
+
+		new_item->next = *top;
+		*ends = new_item;
+		*top = new_item;
+	}
+}
+
+//Добавление элемента Дэка в конец
+void Deque::push_f(Deque **top, Deque **ends, int price, char*familia, char*model)
+{
+	Deque *new_item;
+	new_item = new Deque;
+	new_item->price = price;
+	strcpy(new_item->familia, familia);
+	strcpy(new_item->model, model);
+	if (*top) {
+
+		int flag01 = 0;
+		Deque *tp = *top;
+		while (tp)
+		{
+			if (tp == *ends) {
+				new_item->next = 0;
+				tp->next = new_item;
+				*ends = new_item;
+				break;
+			}
+
+			tp = tp->next;
+		}
+
+		//new_item->next = *top;
+		//*top = new_item;
+
+	}
+	else {
+
+		new_item->next = *top;
+		*ends = new_item;
+		*top = new_item;
+	}
+}
+
+//Удаление с начала
+void Deque::del_h(Deque **pbeg)
+{
+	int flag4 = 0;
+	if (*pbeg)
+	{
+		Deque *current = *pbeg;
+		Deque *previous = 0;
+
+		//удаление в начале стека 
+		if (current == *pbeg)
+		{
+			*pbeg = (*pbeg)->next;
+			flag4 = 1;
+		}
+
+
+		previous = current;
+		current = current->next;
+
+
+		if (flag4 == 1) printf("\nDeleted! \n");
+	}
+	else
+	{
+
+		printf("\nDeque is empty! \n");
+	}
+}
+
+//Удаление с конца
+void Deque::del_f(Deque **pbeg, Deque **ends) 
+{
+	if (*pbeg) {
+		//int flag01 = 0;
+		Deque *tp = *pbeg;
+		while (tp)
+		{
+			if (*pbeg = *ends) {
+				*pbeg = 0;
+				*ends = 0;
+				break;
+			}
+
+			if (tp->next == *ends) {
+				//new_item->next = 0;
+				tp->next = 0;
+				*ends = tp;
+				break;
+			}
+
+			tp = tp->next;
+		}
+		 printf("\nDeleted! \n");
+	}
+	else
+	{
+
+		printf("\nDeque is empty! \n");
+	}
+}
+
+//Вывод Дэка
+void Deque::view(Deque **q)
+{
+	int flag2 = 0;
+	Deque *tp = *q;
+	while (tp)
+	{
+		flag2 = 1;
+		std::cout << tp->price << "\t\t" << tp->familia << "\t\t\t" << tp->model << "\n";
+		tp = tp->next;
+	}
+	if (flag2 == 0) printf("\nDeque is empty! \n");
+}
+
+//Поиск по фамилии 
+void Deque::search(Deque **q, char* fam)
+{
+	Deque *t3 = *q;
+	while (t3)
+
+	{
+		if (strcmp(t3->familia, fam) == 0)
+		{
+			std::cout << t3->price << "\t\t\t" << t3->familia << "\t" << t3->model << "\n";
+		}
+		t3 = t3->next;
+	}
+}
+
+
+int  main()
+{
+	//_t int argc, _TCHAR* argv[]
+
+    //setlocale(LC_ALL, "Russian");
+
+	Stack plane;
+	Que pl;
+	Que *t = 0;
+	Que *e = 0;
+	Deque us;
+	Deque *t1 = 0;
+	Deque *e1 = 0;
+	int c;
+	Stack *q = 0;
+	int price;
+	char fam[100];
+	char familia[100];
+	char model[50];
+	int num;
+
+
+	int flag10 = 0;
+
+
+	//выводим меню 
+
+	system("cls");
+	std::cout << ("\n1-Stack \n");
+	std::cout << "2-Queue" << endl;
+	printf("3-Deque\n");
+	printf("Choise action: ");
+	scanf_s("%i", &c);
+	switch (c)
+	{
+
+	case 1:   //Стэк
+		while (true)
+		{
+			system("cls");
+			std::cout << ("\n1-Write element stack \n");
+			std::cout << "2-Delete element stack" << endl;
+			printf("3-Write all stack \n");
+			printf("4-Search on surname \n");
+			printf("5-exit \n");
+			printf("Choise action: ");
+			scanf_s("%i", &c);
+			switch (c)
+			{
+				//добавление информации о телефонах 
+			case 1:
+				system("cls");
+
+				printf("Price phone: ");
+				//cin.getline(&price, 15);
+				scanf_s("%d", &price);
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				//cin.getline(&price,)
+				printf("Surname Seller: ");
+				//scanf_s("%s", familia, 100);
+				cin.getline(familia, 100);
+				printf("Model phone: ");
+				//scanf_s("%s", model, 100);
+				cin.getline(model, 50);
+
+				//в очередь 
+				plane.push(&q, price, familia, model);
+				
+				break;
+
+
+
+				//удаление из очереди 
+			case 2:system("cls");
+				plane.del(&q, 1);
+				system("pause");
+				break;
+
+				//вывод информации о всех продавцах 
+			case 3:system("cls");
+				printf("\n List phone \n");
+				printf("\nPrice:\t\tSurname Seller: \tModel: \n");
+				plane.view(&q);
+				_getch();
+				system("pause");
+				break;
+
+				//вывод информации по указанной фамилии продавца 
+			case 4:system("cls");
+				printf(" Write surname  seller:\n");
+				//scanf_s("%s", &fam, 100);
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				cin.getline(fam, 100);
+
+				printf("\n List sell phone: \n");
+				plane.view_d(&q, fam);
+				system("pause");
+				_getch();
+				break;
+
+				//выход 
+			case 5:exit(0);
+
+			default: printf("\nRepeat chooce!\n");
+
+			}
+
+		}
+	case 2: //Очередь
+		while (true)
+		{
+
+			system("cls");
+			std::cout << ("\n1-Write element queue \n");
+			std::cout << "2-Delete element queue" << endl;
+			printf("3-Write all queue \n");
+			printf("4-Search on surname \n");
+			printf("5-exit \n");
+			printf("Choise action: ");
+			scanf_s("%i", &c);
+			switch (c)
+			{
+				//добавление информации о телефонах 
+			case 1:
+				system("cls");
+
+				printf("Price phone: ");
+				//cin.getline(&price, 15);
+				scanf_s("%d", &price);
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				//cin.getline(&price,)
+				printf("Surname Seller: ");
+				//scanf_s("%s", familia, 100);
+				cin.getline(familia, 100);
+				printf("Model phone: ");
+				//scanf_s("%s", model, 100);
+				cin.getline(model, 50);
+
+				//в очередь 
+				pl.push(&t, &e, price, familia, model);
+				break;
+
+
+
+				//удаление из очереди 
+			case 2:system("cls");
+				pl.del(&t);
+				system("pause");
+				break;
+
+				//вывод информации о всех продавцах 
+			case 3:system("cls");
+				printf("\n List phone \n");
+				printf("\nPrice:\t\tSurname Seller: \tModel: \n");
+				pl.view(&t);
+				_getch();
+				system("pause");
+				break;
+
+				//вывод информации по указанной фамилии продавца 
+			case 4:system("cls");
+				printf(" Write surname  seller:\n");
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				cin.getline(fam, 100);
+
+				printf("\n List sell phone: \n");
+				pl.view_s(&t, fam);
+				system("pause");
+				_getch();
+				break;
+
+				//выход 
+			case 5:exit(0);
+
+			default: printf("\nRepeat chooce!\n");
+
+			}
+
+		}
+	case 3: //Дэк
+		while (true)
+		{
+			system("cls");
+			cout << "\n1-Write element Deque in footer" << endl;
+			cout << "2-Write element Deque in head" << endl;
+			cout << "3-Delete element Deque in head" << endl;
+			cout << "4-Delete element Deque in footer" << endl;
+			cout << "5-Write all Deque" << endl;
+			cout << "6-Search on surname" << endl;
+			cout << "7-Exit" << endl;
+			printf("Choise action: ");
+			scanf_s("%i", &c);
+			switch (c)
+			{
+				//добавление информации о телефонах  в конец
+			case 1:
+				system("cls");
+
+				printf("Price phone: ");
+				scanf_s("%d", &price);
+
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+				printf("Surname Seller: ");
+				cin.getline(familia, 100);
+
+				printf("Model phone: ");
+				cin.getline(model, 50);
+
+				//в очередь 
+				us.push_f(&t1, &e1, price, familia, model);
+				break;
+
+				//добавление мнформации о телефонаъ в начало 
+			case 2:
+				system("cls");
+
+				printf("Price phone: ");
+				scanf_s("%d", &price);
+
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+				printf("Surname Seller: ");
+				cin.getline(familia, 100);
+
+				printf("Model phone: ");
+				cin.getline(model, 50);
+
+				//в очередь 
+				us.push_h(&t1, &e1, price, familia, model);
+				break;
+
+				//удаление из начала
+			case 3:system("cls");
+				us.del_h(&t1);
+				system("pause");
+				break;
+
+				//удаление с конца
+			case 4:system("cls");
+				us.del_f(&t1,&e1);
+				system("pause");
+				break;
+				//вывод информации о всех продавцах 
+			case 5:system("cls");
+				printf("\n List phone \n");
+				printf("\nPrice:\t\tSurname Seller: \tModel: \n");
+				us.view(&t1);
+				_getch();
+				system("pause");
+				break;
+
+				//вывод информации по указанной фамилии продавца 
+			case 6:system("cls");
+				printf(" Write surname  seller:\n");
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				cin.getline(fam, 100);
+
+				printf("\n List sell phone: \n");
+				us.search(&t1, fam);
+				system("pause");
+				_getch();
+				break;
+
+				//выход 
+			case 7:exit(0);
+
+			default: printf("\nRepeat choice!\n");
+
+			}
+
+		}
+
+
+	default: printf("\nRepeat choice!\n");
+
+	}
+}

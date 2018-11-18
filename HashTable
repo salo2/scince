@@ -1,0 +1,210 @@
+#include "stdafx.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cmath>
+using namespace std;
+
+
+ // тип элементов
+typedef string dataString;
+// индекс в хеш-таблице
+
+
+
+
+
+
+class MyHash
+{
+
+private:
+	struct dataSH {
+		long int pasport_data;
+		string surname;
+	};
+	typedef long long int T;
+	T *hashTable;
+	long int hashTableSize;
+	string *used;
+	dataSH *dataSt;
+
+
+public:
+	dataSH Structura;
+
+	MyHash(int TableSize) {
+		
+		hashTableSize = TableSize;
+		hashTable = new T[hashTableSize];
+		used = new string[hashTableSize];
+
+		dataSt = new dataSH[hashTableSize];
+		
+		for (int i = 0; i < hashTableSize; i++) {
+			hashTable[i] = 0;
+			used[i] = "Free";
+		}
+	}
+
+
+
+	// хеш-функция размещения величины
+	int myhash(T data) {
+		return (abs(data % hashTableSize));
+	}
+
+	// Вывод 
+	void View_Element(dataSH data) {
+		int bucket;
+		int i = 0;
+		bucket = myhash(data.pasport_data);
+		while ((used[bucket] == "Ent" || used[bucket] == "Del") && dataSt[bucket].surname != data.surname && hashTable[bucket] != data.pasport_data && i< hashTableSize) {
+			bucket = (bucket + 1) % hashTableSize;
+			i++;
+		}
+		if (used[bucket] == "Ent" && hashTable[bucket] == data.pasport_data && dataSt[bucket].surname == data.surname) {
+			cout << dataSt[bucket].pasport_data << " : " << dataSt[bucket].surname << " : " << used[bucket] << " : " << hashTable[bucket] << endl;
+		}
+		else {
+			cout << "\n\n Not Found \n";
+		}
+	}
+
+	void View() {
+		for (int i = 0; i < hashTableSize; i++) {
+			cout << i << "  :  " << dataSt[i].pasport_data << " : " << dataSt[i].surname << " : " << used[i] << " : " << hashTable[i] << endl;
+		}
+	}
+	//Строка в инт
+	int StringToInt(string data) {
+		int buf = 0;
+		int p = 5;
+		for (int j = 0; data.length() > j; j++) {
+			buf = buf + (data[j] * pow(p, j));
+		}
+		return buf;
+	}
+
+	// функция поиска местоположения и вставки величины в таблицу
+	bool insertData( dataSH dataStru) {
+
+		int bucket;
+		int i = 0;
+		bucket = myhash(dataStru.pasport_data);
+		int nw;
+		nw = dataStru.pasport_data;
+		if (findData(dataStru)) {
+			return false;
+		}
+		while (used[bucket] == "Ent"  && hashTable[bucket] != nw && i< hashTableSize && dataSt[bucket].surname != dataStru.surname) {
+
+			bucket = (bucket + 1) % hashTableSize;
+			i++;
+		}
+		if (used[bucket] == "Del" || used[bucket] == "Free") {
+			used[bucket] = "Ent";
+			hashTable[bucket] = dataStru.pasport_data;
+			dataSt[bucket].pasport_data = dataStru.pasport_data;
+			dataSt[bucket].surname = dataStru.surname;
+			return true;
+		}
+		return false;
+	}
+
+	// функция поиска величины, равной data
+	bool findData(dataSH data) {
+		int bucket;
+		int i = 0;
+		bucket = myhash(data.pasport_data);
+		while ((used[bucket] == "Ent" || used[bucket] == "Del") && dataSt[bucket].surname != data.surname && hashTable[bucket] != data.pasport_data && i< hashTableSize) {
+			bucket = (bucket + 1) % hashTableSize;
+			i++;
+		}
+		return (used[bucket] == "Ent" && hashTable[bucket] == data.pasport_data);
+	}
+
+	//функция удаления величины из таблицы
+	bool deleteData(dataSH data) {
+		int bucket, gap;
+		int i = 0;
+		bucket = myhash(data.pasport_data);
+		gap = bucket;
+		while ((used[bucket] == "Ent" || used[bucket] == "Del") && dataSt[bucket].surname != data.surname && hashTable[bucket] != data.pasport_data && i< hashTableSize) {
+			bucket = (bucket + 1) % hashTableSize;
+			i++;
+		}
+
+		if (used[bucket] == "Ent" && hashTable[bucket] == data.pasport_data && dataSt[bucket].surname == data.surname) {
+			used[bucket] = "Del";
+			dataSt[bucket].pasport_data = 0;
+			dataSt[bucket].surname.clear();
+			hashTable[bucket] = 0;
+			return true;
+		}
+		return false;
+	}
+};
+
+
+
+
+int main() {
+
+      MyHash plane(10);
+	  string sd;
+	  plane.Structura.pasport_data = 1;
+	  plane.Structura.surname = "Sa41";
+	 
+	  for (int i = 1; i < 15; i++) {
+		 
+		  plane.insertData(plane.Structura);
+	      plane.Structura.pasport_data = i * 5;
+		  plane.Structura.surname[1]++;
+	  }
+	  //sd = "Sa" + 50 + i;
+	 // int prov = plane.StringToInt(sd);
+	
+	  plane.View();
+	  cout << endl<<endl;
+	  plane.Structura.surname = "Sa41";
+
+	  for (int i = 1; i < 15; i=i+1) {
+		 
+		  if (i % 3 == 0) { plane.deleteData(plane.Structura); cout << plane.Structura.pasport_data << " " << plane.Structura.surname << endl; }
+		  plane.Structura.pasport_data = i * 5;
+		  plane.Structura.surname[1]= plane.Structura.surname[1]+1;
+	  }
+	  
+	  plane.View();
+	  cout << endl<<endl;
+	  plane.Structura.pasport_data = 1;
+	  plane.Structura.surname = "Sa41";
+
+	  for (int i = 1; i < 15; i++) {
+
+		  plane.insertData(plane.Structura);
+		  plane.Structura.pasport_data = i * 5;
+		  plane.Structura.surname[1]++;
+	  }
+	  //sd = "Sa" + 50 + i;
+	  // int prov = plane.StringToInt(sd);
+
+	  plane.View();
+	  cout << endl << endl;
+	  plane.Structura.surname = "Sa41";
+
+	  for (int i = 1; i < 15; i = i + 1) {
+
+		   { plane.deleteData(plane.Structura); cout << plane.Structura.pasport_data << " " << plane.Structura.surname << endl; }
+		  plane.Structura.pasport_data = i * 5;
+		  plane.Structura.surname[1] = plane.Structura.surname[1] + 1;
+	  }
+
+	  plane.View();
+	  cout << endl << endl;
+
+	std::system("pause");
+	return 0;
+}
+

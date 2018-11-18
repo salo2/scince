@@ -1,0 +1,437 @@
+
+#include "stdafx.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+
+
+using namespace std;
+class List{
+
+	struct list {
+		int field; // поле данных
+		struct list *next; // указатель на следующий элемент
+		struct list *prev; // указатель на предыдущий элемент
+	};
+private:
+	list *lst;
+	bool clear;
+public:
+	
+	List() {
+
+			// выделение памяти под корень списка
+			clear = true;
+			lst = (struct list*)malloc(sizeof(struct list));
+			lst->field = NULL;
+			lst->next = NULL; // указатель на следующий узел
+			lst->prev = NULL; // указатель на предыдущий узел
+			//return(lst);
+		
+	}
+
+	List(const List& B) {
+		list *p;
+		
+		clear = true;
+		lst = (struct list*)malloc(sizeof(struct list));
+		lst->field = NULL;
+		lst->next = NULL; // указатель на следующий узел
+		lst->prev = NULL; // указатель на предыдущий узел
+		p = B.lst;
+		
+			  while (p != NULL) {
+				
+				addelem(p->field);
+				p = p->next;
+			}
+		
+		clear = B.clear;
+
+	}
+
+
+	List &operator=(const List& B) {
+		list *p;
+		List nw;
+		p = B.lst;
+		clear = true;
+		this->lst = (struct list*)malloc(sizeof(struct list));
+		this->lst->field = NULL;
+		this->lst->next = NULL; // указатель на следующий узел
+		this->lst->prev = NULL;
+		
+		do {
+			if (B.clear == true && p->field == 0) {
+
+			}
+			else {
+				addelem(p->field);
+			}
+			
+			p = p->next;
+		} while (p != NULL);
+		
+		clear = B.clear;
+		return *this;
+	}
+	List operator-(int B)
+	{
+		list *p;
+		p = this->lst;
+		bool tc = this->clear;
+		List nw;
+		do {
+			if (tc == true && p->field == 0) {
+
+			}
+			else {
+				nw.addelem(p->field);
+			}
+			p = p->next;
+		} while (p != NULL);
+
+
+		nw.deletelem(B);
+
+
+		return nw;
+
+	}
+	
+	List operator+(int B)
+	{
+		list *p, *p2;
+		p = this->lst;
+		bool tc = this->clear;
+		List nw;
+		
+		do {
+			if (tc == true && p->field == 0) {
+
+			}
+			else {
+				nw.addelem(p->field);
+			}
+			
+			p = p->next;
+		} while (p != NULL);
+
+		nw.addelem(B);
+
+
+		return nw;
+	} 
+
+	// List A + List B = List C
+	List operator+(const List& B)
+	{
+		list *p,*p2;
+		p = B.lst;
+		p2 = this->lst;
+		bool tc = this->clear;
+		List nw;
+		do {
+			if (tc == true && p2->field == 0) {}
+			else {
+				nw.addelem(p2->field);
+			}
+			p2 = p2->next;
+		} while (p2 != NULL);
+
+		do {
+
+				nw.addelem(p->field);
+
+			p = p->next;
+		} while (p != NULL);
+		
+			return nw;
+
+	}
+
+	List operator-(const List& B)
+	{
+		list *p,*p2;
+		p = B.lst;
+		p2 = this->lst;
+		bool tc = this->clear;
+		List nw;
+		do {
+			if (tc == true && p2->field == 0) {}
+			else {
+				nw.addelem(p2->field);
+			}
+			p2 = p2->next;
+		} while (p2 != NULL);
+
+		do {
+			nw.deletelem(p->field);
+			p = p->next;
+		} while (p != NULL);
+
+		return nw;
+	}
+
+
+
+	int lenghtl() {
+		struct list *p;
+		int i = 0;
+		p = lst;
+		if (!clear) {
+			do {
+				i++;
+				p = p->next;
+			} while (p != NULL); // условие окончания обхода
+			return i;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	void addelem(int number) {
+		struct list *temp2, *temp, *p,*p2,*lst2;
+		
+		int te;
+		temp = (struct list*)malloc(sizeof(list));
+		temp2 = (struct list*)malloc(sizeof(list));
+
+		if (lst->field == NULL && lst->next == NULL && clear) {
+			lst->field = number;
+			clear = false;
+		}else if(lst->next == NULL){
+			if (lst->field < number) {
+				lst->next = temp;
+				temp->field = number;
+				temp->next = NULL;
+				temp->prev = lst;
+			}
+			else {
+				te = lst->field;
+				lst->field = number;
+				lst->next = temp;
+				temp->next = NULL;
+				temp->prev = lst;
+				temp->field = te;
+				
+			}
+		}
+		else{
+			int i = 0;
+			lst2 = lst;
+
+
+			while (lst2 != NULL) {
+
+				if (lst2->prev == NULL && lst2->field > number) {
+					temp->next = lst;
+					temp->prev = NULL;
+					temp->field = number;
+					lst = temp;
+					break;
+				}
+				
+				if ( lst2->next != NULL && lst2->next->field == number ) {
+					p = lst2->next;
+
+					lst2->next = temp;
+					//lst2->field = number;
+
+					temp->next = p;
+					temp->prev = lst2;
+					temp->field = number;
+
+					if (p != NULL)
+						p->prev = temp;
+					break;
+
+				}
+				else if(lst2->next == NULL){
+					lst2->next = temp2;
+					temp2->field = number;
+					temp2->next = NULL;
+					temp2->prev = lst2;
+					break;
+				}
+
+
+				if (lst2->next != NULL && lst2->next->field > number) {
+					//te = lst2->field;
+					p = lst2->next;
+
+					lst2->next = temp;
+					//lst2->field = number;
+
+					temp->next = p;
+					temp->prev = lst2;
+					temp->field = number;
+
+					if (p != NULL)
+						p->prev = temp;
+					
+
+					break;
+
+				}
+				else if(lst2->next == NULL){
+					lst2->next = temp2;
+					temp2->field = number;
+					temp2->next = NULL;
+					temp2->prev = lst2;
+					break;
+				}
+
+
+				//lst = lst2;
+				if (lst2->field < number && lst2->next == NULL) {
+					lst2->next = temp2;
+					temp2->field = number;
+					temp2->next = NULL;
+					temp2->prev = lst2;
+					break;
+				}
+
+				lst2 = lst2->next;
+
+
+
+			}
+
+
+
+		}
+
+	}
+	void deletelem(int number) {
+		struct list *prev, *next,*temp2,*lst2;
+		
+		lst2 = lst;
+
+		while (lst2 != NULL) {
+				
+			if (lst2->field == number) {
+				//temp2 = getelem(ind);
+				//prev = lst2->prev; // узел, предшествующий lst
+				//next = lst2->next; // узел, следующий за lst
+				
+				if (lst2->prev == NULL && lst2->next == NULL) {
+					this->clear = true;
+					lst2->field = NULL;
+					break;
+				}
+
+				if (lst2->prev == NULL && lst2->next != NULL) {
+					//lst2->next->prev = NULL;
+					lst2->next->prev = NULL;
+					lst = lst2->next;
+					break;
+				}
+				if (lst2->prev != NULL && lst2->next == NULL) {
+					lst2->prev->next = NULL;
+
+					break;
+				}
+
+				//prev = lst2->prev;
+				//next = lst2->next;
+
+				lst2->prev->next = lst2->next;
+				lst2->next->prev = lst2->prev;
+				break;
+
+
+			/*	if (lst2->prev != NULL)
+					lst2->prev->next = lst2->next; // переставляем указатель
+				if (lst2->next != NULL)
+					lst2->next->prev = lst2->prev; // переставляем указатель
+				//free(lst2); // освобождаем память удаляемого элемента
+				break; */
+				//return(prev);
+			}
+			lst2 = lst2->next;
+			
+	
+		}
+		//this->clear = true;
+	}
+	
+	bool search(int number) {
+		
+		list *p;
+		p = lst;
+		do{
+			if (p->field == number && !clear)
+				return true;
+			p = p->next;
+		} while (p != NULL);
+
+			return false;
+	}
+
+
+	void listprint() {
+		struct list *p;
+		clear = this->clear;
+		p = lst;
+		if (!clear) {
+			do {
+				printf("%d ", p->field); // вывод значения элемента p
+				p = p->next; // переход к следующему узлу
+			} while (p != NULL); // условие окончания обхода
+		}
+		else {
+			printf("List empty");
+		}
+	}
+	void listprintr() {
+		struct list *p;
+		p = lst;
+		while (p->next != NULL)
+			p = p->next;  // переход к концу списка
+		do {
+			printf("%d ", p->field); // вывод значения элемента p
+			p = p->next; // переход к следующему узлу
+		} while (p != NULL); // условие окончания обхода
+	}
+
+
+}; 
+
+
+
+int main() {
+	
+	
+	int num;
+
+	List need,n2,n3;
+
+
+	for (int i = 15; i > 1; i = i -1) {
+
+
+		//need.addelem(i);
+		n2 = n2 +  i;
+		n3 = n3 + (2 * i );
+		
+		
+	}
+	cout << endl << "n2 :" << endl;
+	n2.listprint();
+
+	cout << endl << ": n3  :" << endl;
+	n3.listprint();
+
+	//cout << (need = n2 = need + n2 - n3-n2-n3).lenghtl() << endl;
+
+	cout << endl << ": need  :" << endl;
+	need.listprint();
+
+	cout << endl << "n2 :" << endl;
+	n2.listprint();
+
+	getchar(); getchar();
+	return 0;
+}

@@ -1,0 +1,240 @@
+using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Hash;
+
+namespace UnitTestProject1
+{
+    [TestClass]
+    public class UnitTest1
+    {
+        
+        DataSt data;
+        Dat DataF;
+        [TestMethod]
+        public void TestInsert_double_passport_data()
+        {
+            // Проверка на добавления записей с одинковым паспортом и разными фамилиями 
+            // Второй элемент не должен добавиться 
+            MyHash nw = new MyHash(10);
+            data.pasport_data = 10;
+            data.surname = "Sa1";
+            Assert.AreEqual(true, nw.insertData(data));
+            data.pasport_data = 10;
+            data.surname = "Sa2";
+            Assert.AreEqual(false, nw.insertData(data));
+        }
+
+        [TestMethod]
+        public void TestInsert_double_surname_data()
+        {
+            // Проверка на добавления элемента с разным паспортом и одинаковой фамилией 
+            // Второй элемент должен добавиться 
+            MyHash nw = new MyHash(10);
+            data.pasport_data = 10;
+            data.surname = "Sa1";
+            Assert.AreEqual(true, nw.insertData(data));
+            data.pasport_data = 101;
+            data.surname = "Sa1";
+            Assert.AreEqual(true, nw.insertData(data));
+        }
+        [TestMethod]
+        public void TestInsert_full_table_perepol()
+        {
+            // Проверка на переполнение
+            // Оба обьекта должны быть равны 
+            MyHash nw = new MyHash(10);
+            MyHash nw2 = new MyHash(10);
+            for(int i = 0; i<15; i++)
+            {
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.insertData(data);
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw2.insertData(data);
+            }
+            nw.View();
+            nw2.View();
+           Dat[] Arranw = nw.ArrayHs();
+           Dat[] Arranw2 = nw2.ArrayHs();
+
+            for(int i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(Arranw[i].pasport_data, Arranw2[i].pasport_data);
+                Assert.AreEqual(Arranw[i].surname, Arranw2[i].surname);
+                Assert.AreEqual(Arranw[i].bucketMas, Arranw2[i].bucketMas);
+            }
+           
+        }
+        [TestMethod]
+        public void TestInsertAndDel()
+        {
+            // Заполняем и удаляем все элементы таблицы
+            // Таблица должна быть пустой
+            MyHash nw = new MyHash(10);
+           
+            for (int i = 0; i < 15; i++)
+            {
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.insertData(data);
+            }
+            for (int i = 0; i < 15; i++)
+            {
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.deleteData(data);
+            }
+
+            nw.View();
+
+            Dat[] Arranw = nw.ArrayHs();
+
+
+            for (int i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(Arranw[i].pasport_data, 0);
+                Assert.AreEqual(Arranw[i].surname, "");
+                Assert.AreEqual(Arranw[i].bucketMas, -1);
+                Assert.AreEqual(Arranw[i].used, "Del");
+            }
+
+        }
+
+        [TestMethod]
+        public void TestDelNotInsertElement()
+        {
+            // Проверка на удаление элемента отсутсвующего в таблице
+            // Функция должна вернуть false
+            MyHash nw = new MyHash(10);
+            for (int i = 0; i < 10; i++)
+            {
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.insertData(data);
+            }
+            data.pasport_data = 10;
+            data.surname = "Sggg";
+            Assert.AreEqual(false, nw.deleteData(data));
+        }
+        [TestMethod]
+        public void TestFindeElement()
+        {
+
+            MyHash nw = new MyHash(10);
+            for (int i = 0; i < 10; i++)
+            {
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.insertData(data);
+            }
+            data.pasport_data = 13;
+            data.surname = "Sa13";
+            Assert.AreEqual(true, nw.findData(data));
+
+        }
+
+        [TestMethod]
+        public void TestFindeElementNotInsert()
+        {
+
+            MyHash nw = new MyHash(10);
+            for (int i = 0; i < 10; i++)
+            {
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.insertData(data);
+            }
+            data.pasport_data = 131;
+            data.surname = "Sa12";
+            Assert.AreEqual(false, nw.findData(data));
+
+        }
+
+        [TestMethod]
+        public void TestCountElements()
+        {
+
+            MyHash nw = new MyHash(10);
+            for (int i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(i, nw.Count_Insert_Element());
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.insertData(data);
+
+            }
+            Assert.AreEqual(10, nw.Count_Insert_Element());
+
+        }
+        [TestMethod]
+        public void TestCountElementsDel()
+        {
+
+            MyHash nw = new MyHash(10);
+            for (int i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(i, nw.Count_Insert_Element());
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.insertData(data);
+
+            }
+            int j = 10;
+            for (int i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(j, nw.Count_Insert_Element());
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.deleteData(data);
+                j--;
+
+            }
+            Assert.AreEqual(0, nw.Count_Insert_Element());
+
+        }
+
+        [TestMethod]
+        public void TestViewElements()
+        {
+
+            MyHash nw = new MyHash(10);
+            for (int i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(i, nw.Count_Insert_Element());
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.insertData(data);
+
+            }
+            data.pasport_data = 11;
+            data.surname = "Sa11";
+           DataF = nw.View_Element(data);
+            Assert.AreEqual(DataF.pasport_data, 11);
+            Assert.AreEqual(DataF.surname, "Sa11");
+            Assert.AreEqual(DataF.used, "Ent");
+            Assert.AreEqual(DataF.bucketMas, 1);
+        }
+        [TestMethod]
+        public void TestViewElementNotInsert()
+        {
+
+            MyHash nw = new MyHash(10);
+            for (int i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(i, nw.Count_Insert_Element());
+                data.pasport_data = 10 + i;
+                data.surname = "Sa1" + i;
+                nw.insertData(data);
+
+            }
+            data.pasport_data = 1121;
+            data.surname = "Sa11s";
+            DataF = nw.View_Element(data);
+            Assert.AreEqual(DataF.used, "NO");
+        }
+    }
+}

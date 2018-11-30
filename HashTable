@@ -1,210 +1,587 @@
-#include "stdafx.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <cmath>
-using namespace std;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-
- // тип элементов
-typedef string dataString;
-// индекс в хеш-таблице
-
-
-
-
-
-
-class MyHash
+namespace Hash
 {
+    public struct DataSt
+    {
+        public long pasport_data;
+        public string surname;
+    };
+    public struct Dat
+    {
+        public long i;
+        public long pasport_data;
+        public string surname;
+        public string used;
+        public long bucketMas;
+    };
+    public class MyHash
+    {
 
-private:
-	struct dataSH {
-		long int pasport_data;
-		string surname;
-	};
-	typedef long long int T;
-	T *hashTable;
-	long int hashTableSize;
-	string *used;
-	dataSH *dataSt;
-
-
-public:
-	dataSH Structura;
-
-	MyHash(int TableSize) {
-		
-		hashTableSize = TableSize;
-		hashTable = new T[hashTableSize];
-		used = new string[hashTableSize];
-
-		dataSt = new dataSH[hashTableSize];
-		
-		for (int i = 0; i < hashTableSize; i++) {
-			hashTable[i] = 0;
-			used[i] = "Free";
-		}
-	}
+        private int hashTableSize;
+        private long[] hashTable;
+        private string[] used;
+        private DataSt[] dataSt;
+        private long[] bucketMas;
+        private Dat[] ArrayHash;
+        private int Colizii = 0;
+        public MyHash(int TableSize)
+        {
 
 
+            hashTableSize = Math.Abs(TableSize);
+            hashTable = new long[hashTableSize];
+            used = new string[hashTableSize];
+            dataSt = new DataSt[hashTableSize];
+            ArrayHash = new Dat[hashTableSize];
+            bucketMas = new long[hashTableSize];
+            for (int i = 0; i < hashTableSize; i++)
+            {
+                hashTable[i] = 0;
+                used[i] = "Free";
+                bucketMas[i] = -1;
+            }
+        }
+        public int Size()
+        {
+            return hashTableSize;
+        }
+        public int Count_Insert_Element()
+        {
+            int bucket = 0;
+            int i = 0;
 
-	// хеш-функция размещения величины
-	int myhash(T data) {
-		return (abs(data % hashTableSize));
-	}
+            while (i < hashTableSize)
+            {
 
-	// Вывод 
-	void View_Element(dataSH data) {
-		int bucket;
-		int i = 0;
-		bucket = myhash(data.pasport_data);
-		while ((used[bucket] == "Ent" || used[bucket] == "Del") && dataSt[bucket].surname != data.surname && hashTable[bucket] != data.pasport_data && i< hashTableSize) {
-			bucket = (bucket + 1) % hashTableSize;
-			i++;
-		}
-		if (used[bucket] == "Ent" && hashTable[bucket] == data.pasport_data && dataSt[bucket].surname == data.surname) {
-			cout << dataSt[bucket].pasport_data << " : " << dataSt[bucket].surname << " : " << used[bucket] << " : " << hashTable[bucket] << endl;
-		}
-		else {
-			cout << "\n\n Not Found \n";
-		}
-	}
+                if (used[i] == "Ent")
+                    bucket++;
+                i++;
+            }
+            return bucket;
 
-	void View() {
-		for (int i = 0; i < hashTableSize; i++) {
-			cout << i << "  :  " << dataSt[i].pasport_data << " : " << dataSt[i].surname << " : " << used[i] << " : " << hashTable[i] << endl;
-		}
-	}
-	//Строка в инт
-	int StringToInt(string data) {
-		int buf = 0;
-		int p = 5;
-		for (int j = 0; data.length() > j; j++) {
-			buf = buf + (data[j] * pow(p, j));
-		}
-		return buf;
-	}
+        }
+        public int Coliz()
+        {
+            return Colizii;
+        }
 
-	// функция поиска местоположения и вставки величины в таблицу
-	bool insertData( dataSH dataStru) {
-
-		int bucket;
-		int i = 0;
-		bucket = myhash(dataStru.pasport_data);
-		int nw;
-		nw = dataStru.pasport_data;
-		if (findData(dataStru)) {
-			return false;
-		}
-		while (used[bucket] == "Ent"  && hashTable[bucket] != nw && i< hashTableSize && dataSt[bucket].surname != dataStru.surname) {
-
-			bucket = (bucket + 1) % hashTableSize;
-			i++;
-		}
-		if (used[bucket] == "Del" || used[bucket] == "Free") {
-			used[bucket] = "Ent";
-			hashTable[bucket] = dataStru.pasport_data;
-			dataSt[bucket].pasport_data = dataStru.pasport_data;
-			dataSt[bucket].surname = dataStru.surname;
-			return true;
-		}
-		return false;
-	}
-
-	// функция поиска величины, равной data
-	bool findData(dataSH data) {
-		int bucket;
-		int i = 0;
-		bucket = myhash(data.pasport_data);
-		while ((used[bucket] == "Ent" || used[bucket] == "Del") && dataSt[bucket].surname != data.surname && hashTable[bucket] != data.pasport_data && i< hashTableSize) {
-			bucket = (bucket + 1) % hashTableSize;
-			i++;
-		}
-		return (used[bucket] == "Ent" && hashTable[bucket] == data.pasport_data);
-	}
-
-	//функция удаления величины из таблицы
-	bool deleteData(dataSH data) {
-		int bucket, gap;
-		int i = 0;
-		bucket = myhash(data.pasport_data);
-		gap = bucket;
-		while ((used[bucket] == "Ent" || used[bucket] == "Del") && dataSt[bucket].surname != data.surname && hashTable[bucket] != data.pasport_data && i< hashTableSize) {
-			bucket = (bucket + 1) % hashTableSize;
-			i++;
-		}
-
-		if (used[bucket] == "Ent" && hashTable[bucket] == data.pasport_data && dataSt[bucket].surname == data.surname) {
-			used[bucket] = "Del";
-			dataSt[bucket].pasport_data = 0;
-			dataSt[bucket].surname.clear();
-			hashTable[bucket] = 0;
-			return true;
-		}
-		return false;
-	}
-};
+        public Dat[] ArrayHs()
+        {
+            return ArrayHash;
+        }
+        // хеш-функция размещения величины
+        private long Hash(long data)
+        {
 
 
+            string BinaryCode = Convert.ToString(data, 10);
+            if (BinaryCode.Length % 2 != 0)
+            {
+                BinaryCode = "0" + BinaryCode;
+            }
+            int cou;
+            cou = BinaryCode.Length / 2;
+            string nw_s = Convert.ToString(Size());
+            long hs = 0;
+            long nw = data;
+            long nw2 = 0;
+            while (nw != 0)
+            {
+                nw2 = Convert.ToInt64(nw % Math.Pow(10, nw_s.Length + 1)); //nw_s.Length
+                nw = nw / Convert.ToInt64(Math.Pow(10, nw_s.Length + 1));
+
+                hs = hs + nw2;
+            }
+            //return (Math.Abs(data % hashTableSize));
+            return Math.Abs(hs % hashTableSize);
+
+        }
 
 
-int main() {
+        public void Clear()
+        {
+            for (int i = 0; i < hashTableSize; i++)
+            {
+                hashTable[i] = 0;
+                used[i] = "Free";
+                dataSt[i].pasport_data = 0;
+                dataSt[i].surname = "";
+                bucketMas[i] = -1;
+            }
+            Colizii = 0;
+        }
 
-      MyHash plane(10);
-	  string sd;
-	  plane.Structura.pasport_data = 1;
-	  plane.Structura.surname = "Sa41";
-	 
-	  for (int i = 1; i < 15; i++) {
-		 
-		  plane.insertData(plane.Structura);
-	      plane.Structura.pasport_data = i * 5;
-		  plane.Structura.surname[1]++;
-	  }
-	  //sd = "Sa" + 50 + i;
-	 // int prov = plane.StringToInt(sd);
-	
-	  plane.View();
-	  cout << endl<<endl;
-	  plane.Structura.surname = "Sa41";
+        // функция поиска величины, равной data
+        public bool findData(DataSt data)
+        {
+            long bucket;
+            int i = 0;
+            bucket = Hash(data.pasport_data);
+            while ((used[bucket] == "Ent" || used[bucket] == "Del") && dataSt[bucket].surname != data.surname && hashTable[bucket] != data.pasport_data && i < hashTableSize)
+            {
+                bucket = (bucket + 1) % hashTableSize;
+                i++;
+            }
+            return (used[bucket] == "Ent" && hashTable[bucket] == data.pasport_data);
+        }
+        // функция поиска местоположения и вставки величины в таблицу
+        public bool insertData(DataSt dataStru)
+        {
 
-	  for (int i = 1; i < 15; i=i+1) {
-		 
-		  if (i % 3 == 0) { plane.deleteData(plane.Structura); cout << plane.Structura.pasport_data << " " << plane.Structura.surname << endl; }
-		  plane.Structura.pasport_data = i * 5;
-		  plane.Structura.surname[1]= plane.Structura.surname[1]+1;
-	  }
-	  
-	  plane.View();
-	  cout << endl<<endl;
-	  plane.Structura.pasport_data = 1;
-	  plane.Structura.surname = "Sa41";
+            long bucket, bucketo;
+            int i = 0;
+            bucket = Hash(dataStru.pasport_data);
+            bucketo = bucket;
+            long nw;
+            nw = dataStru.pasport_data;
+             if (findData(dataStru))
+             {
+                 return false;
+             }
+            while (used[bucket] == "Ent" && hashTable[bucket] != nw && i < hashTableSize && dataSt[bucket].surname != dataStru.surname)
+            {
+                if (i == 0)
+                {
+                    Colizii++;
+                }
+                bucket = (bucket + 1) % hashTableSize;
+                i++;
+            }
+            if (used[bucket] == "Del" || used[bucket] == "Free")
+            {
+                used[bucket] = "Ent";
+                hashTable[bucket] = dataStru.pasport_data;
+                dataSt[bucket].pasport_data = dataStru.pasport_data;
+                dataSt[bucket].surname = dataStru.surname;
+                bucketMas[bucket] = bucketo;
+                return true;
+            }
+            Colizii--;
+            return false;
+        }
+        //функция удаления величины из таблицы
+        public bool deleteData(DataSt data)
+        {
+            long bucket, gap;
+            int i = 0;
+            bucket = Hash(data.pasport_data);
+            gap = bucket;
+            while ((used[bucket] == "Ent" || used[bucket] == "Del") && dataSt[bucket].surname != data.surname && hashTable[bucket] != data.pasport_data &&  i < hashTableSize)
+            {
+                bucket = (bucket + 1) % hashTableSize;
+                i++;
+            }
 
-	  for (int i = 1; i < 15; i++) {
+            if (used[bucket] == "Ent" && hashTable[bucket] == data.pasport_data && dataSt[bucket].surname == data.surname)
+            {
+                used[bucket] = "Del";
+                dataSt[bucket].pasport_data = 0;
+                dataSt[bucket].surname = "";
+                hashTable[bucket] = 0;
+                bucketMas[bucket] = -1;
+                return true;
+            }
+            return false;
+        }
+        public void View()
+        {
 
-		  plane.insertData(plane.Structura);
-		  plane.Structura.pasport_data = i * 5;
-		  plane.Structura.surname[1]++;
-	  }
-	  //sd = "Sa" + 50 + i;
-	  // int prov = plane.StringToInt(sd);
 
-	  plane.View();
-	  cout << endl << endl;
-	  plane.Structura.surname = "Sa41";
+            for (int i = 0; i < hashTableSize; i++)
+            {
+                // Console.WriteLine( $"{i} :  {dataSt[i].pasport_data} : {dataSt[i].surname} : {used[i]} : {hashTable[i]} ");
+                ArrayHash[i].i = i;
+                ArrayHash[i].pasport_data = dataSt[i].pasport_data;
+                ArrayHash[i].surname = dataSt[i].surname;
+                ArrayHash[i].used = used[i];
+                ArrayHash[i].bucketMas = bucketMas[i];
 
-	  for (int i = 1; i < 15; i = i + 1) {
 
-		   { plane.deleteData(plane.Structura); cout << plane.Structura.pasport_data << " " << plane.Structura.surname << endl; }
-		  plane.Structura.pasport_data = i * 5;
-		  plane.Structura.surname[1] = plane.Structura.surname[1] + 1;
-	  }
+            }
+            //  return nw;
+        }
+        // Вывод 
+        public Dat View_Element(DataSt data)
+        {
+            long bucket;
+            int i = 0;
+            bucket = Hash(data.pasport_data);
+            while ((used[bucket] == "Ent" || used[bucket] == "Del") && dataSt[bucket].surname != data.surname && hashTable[bucket] != data.pasport_data && i < hashTableSize)
+            {
+                bucket = (bucket + 1) % hashTableSize;
+                i++;
+            }
+            if (used[bucket] == "Ent" && hashTable[bucket] == data.pasport_data && dataSt[bucket].surname == data.surname)
+            {
+                Dat nw;
+                nw.i = bucket;
+                nw.pasport_data = hashTable[bucket];
+                nw.surname = dataSt[bucket].surname;
+                nw.used = used[bucket];
+                nw.bucketMas = bucketMas[bucket];
+                return nw;
+                //cout << dataSt[bucket].pasport_data << " : " << dataSt[bucket].surname << " : " << used[bucket] << " : " << hashTable[bucket] << endl;
+            }
+            else
+            {
+                Dat nw;
+                nw.i = 0;
+                nw.pasport_data = 0;
+                nw.surname = "";
+                nw.used = "NO";
+                nw.bucketMas = -1;
+                return nw;
+                //Console.WriteLine("\n\n Not Found \n");
+            }
+        }
 
-	  plane.View();
-	  cout << endl << endl;
+    }
+    class Program
+    {
+  
+        static void Main(string[] args)
+        {
+            bool flag = true;
+            int key;
+            MyHash Table = null;
+            // bool flag_Parse = true;
+            Dat dataF;
+            DataSt data;
+            while (flag)
+            {
+                Console.Clear();
+                bool flag_Parse = true;
+                Console.WriteLine("Структура данных - хеш-таблица");
+                Console.WriteLine("Выберете дейтствие: ");
+                Console.WriteLine("1 - Добавить элемент в таблицу");
+                Console.WriteLine("2 - Удалить элемент из таблицы");
+                Console.WriteLine("3 - Есть ли элемент в таблице");
+                Console.WriteLine("4 - Вывести элемент из таблицы");
+                Console.WriteLine("5 - Вывести всю таблицу");
+                Console.WriteLine("6 - Очистить таблицу");
+                Console.WriteLine("7 - Создать  таблицу");
+               
+               string key_str = Console.ReadLine();
+                try
+                {
 
-	std::system("pause");
-	return 0;
+                    long nw = Convert.ToInt64(key_str);
+                }
+                catch (OverflowException)
+                {
+                    flag_Parse = false;
+
+                }
+                catch (FormatException)
+                {
+                    flag_Parse = false;
+
+                }
+                if(flag_Parse == false)
+                {
+                    key = -1;
+                }
+                else
+                {
+                    key = Convert.ToInt32(key_str);
+                }
+                switch (key)
+                {
+                    case 1:
+                        if(Table == null)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Вы не создали таблицу");
+                            Console.ReadLine();
+                            break;
+                        }
+                        Console.WriteLine("Введите пасспорт");
+                       string passport = Console.ReadLine();
+                        
+                        try
+                        {
+                        
+                            long nw = Convert.ToInt64(passport);
+                        }
+                        catch (OverflowException)
+                        {
+                            flag_Parse = false;
+             
+                        }
+                        catch (FormatException)
+                        {
+                            flag_Parse = false;
+                         
+                        }
+                        if(flag_Parse == false)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Не верный формат данных");
+                            Console.ReadLine();
+                            break;
+                        }
+                       long passport_ln = Convert.ToInt64(passport);
+                        Console.WriteLine("Введите фамилию");
+                        string surname = Console.ReadLine();
+                        data.surname = surname;
+                        data.pasport_data = passport_ln;
+                        if (Table.insertData(data))
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Элемент успешно добавлен");
+                            Console.ReadLine();
+                            break;
+                           
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Ошибка добавления");
+                            Console.ReadLine();
+                            break;
+                        }
+                        //break;
+                    case 2:
+                        if (Table == null)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Вы не создали таблицу");
+                            Console.ReadLine();
+                            break;
+                        }
+                        Console.WriteLine("Введите пасспорт");
+                         passport = Console.ReadLine();
+
+                        try
+                        {
+
+                            long nw = Convert.ToInt64(passport);
+                        }
+                        catch (OverflowException)
+                        {
+                            flag_Parse = false;
+
+                        }
+                        catch (FormatException)
+                        {
+                            flag_Parse = false;
+
+                        }
+                        if (flag_Parse == false)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Не верный формат данных");
+                            Console.ReadLine();
+                            break;
+                        }
+                        passport_ln = Convert.ToInt64(passport);
+                        Console.WriteLine("Введите фамилию");
+                         surname = Console.ReadLine();
+                        data.surname = surname;
+                        data.pasport_data = passport_ln;
+                        if (Table.deleteData(data))
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Элемент успешно удален");
+                            Console.ReadLine();
+                            break;
+
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Ошибка удаления");
+                            Console.ReadLine();
+                            break;
+                        }
+
+                       ;
+
+                    case 3:
+                        if (Table == null)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Вы не создали таблицу");
+                            Console.ReadLine();
+                            break;
+                        }
+                        Console.WriteLine("Введите пасспорт");
+                        passport = Console.ReadLine();
+
+                        try
+                        {
+
+                            long nw = Convert.ToInt64(passport);
+                        }
+                        catch (OverflowException)
+                        {
+                            flag_Parse = false;
+
+                        }
+                        catch (FormatException)
+                        {
+                            flag_Parse = false;
+
+                        }
+                        if (flag_Parse == false)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Не верный формат данных");
+                            Console.ReadLine();
+                            break;
+                        }
+                        passport_ln = Convert.ToInt64(passport);
+                        Console.WriteLine("Введите фамилию");
+                        surname = Console.ReadLine();
+                        data.surname = surname;
+                        data.pasport_data = passport_ln;
+                        if (Table.findData(data))
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Элемент есть в таблице");
+                            Console.ReadLine();
+                            break;
+
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Элемента нет в таблице");
+                            Console.ReadLine();
+                            break;
+                        }
+                        ;
+
+                    case 4:
+                        if (Table == null)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Вы не создали таблицу");
+                            Console.ReadLine();
+                            break;
+                        }
+                        Console.WriteLine("Введите пасспорт");
+                        passport = Console.ReadLine();
+
+                        try
+                        {
+
+                            long nw = Convert.ToInt64(passport);
+                        }
+                        catch (OverflowException)
+                        {
+                            flag_Parse = false;
+
+                        }
+                        catch (FormatException)
+                        {
+                            flag_Parse = false;
+
+                        }
+                        if (flag_Parse == false)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Не верный формат данных");
+                            Console.ReadLine();
+                            break;
+                        }
+                        passport_ln = Convert.ToInt64(passport);
+                        Console.WriteLine("Введите фамилию");
+                        surname = Console.ReadLine();
+                        data.surname = surname;
+                        data.pasport_data = passport_ln;
+                        dataF = Table.View_Element(data);
+                        if (dataF.used == "NO")
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Элемента нет в таблице");
+                            Console.ReadLine();
+                            break;
+
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Элемент:");
+                            Console.WriteLine(dataF.i + " | " + dataF.pasport_data + " | " + dataF.surname + " | " + dataF.used + " || " + dataF.bucketMas);
+                            Console.ReadLine();
+                            break;
+                        }
+
+                    case 5:
+                        if (Table == null)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Вы не создали таблицу");
+                            Console.ReadLine();
+                            break;
+                        }
+                        Table.View();
+                        Dat[] Arr = Table.ArrayHs();
+                        for(long i = 0; i<Table.Size(); i++)
+                        {
+                            Console.WriteLine(Arr[i].i +" | "+ Arr[i].pasport_data + " | " + Arr[i].surname + " | "  + Arr[i].used + " || " + Arr[i].bucketMas);
+                        }
+                        Console.ReadLine();
+                        break;
+                    case 6:
+                        if (Table == null)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Вы не создали таблицу");
+                            Console.ReadLine();
+                            break;
+                        }
+                        Table.Clear();
+                        Console.Clear();
+                        Console.WriteLine("Таблица очищена");
+                        Console.ReadLine();
+                        break;
+                    case 7:
+                        Console.Clear();
+                        Console.WriteLine("Введите размер таблицы");
+                        string Size_str = Console.ReadLine();
+                        try
+                        {
+
+                            long nw = Convert.ToInt64(Size_str);
+                        }
+                        catch (OverflowException)
+                        {
+                            flag_Parse = false;
+
+                        }
+                        catch (FormatException)
+                        {
+                            flag_Parse = false;
+
+                        }
+                        if(flag_Parse == false)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Не верный ввод");
+                            Console.WriteLine("  ");
+                            Console.ReadLine();
+                            break;
+                        }
+                        int Size = Convert.ToInt32(Size_str);
+                        Table = new MyHash(Size);
+                        break;
+
+                    default:
+                        Console.Clear();
+                        Console.WriteLine("Не верный ввод");
+                        Console.WriteLine("  ");
+                        Console.ReadLine();
+                        break;
+
+                }
+               
+            }
+        }
+    }
 }
-

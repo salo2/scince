@@ -21,7 +21,7 @@ public:
 	void view_d(Stack **, char*);
 	void del(Stack **top, int);
 
-
+private:
 	int price;
 	char familia[100];
 	char model[50];
@@ -115,7 +115,7 @@ public :
 	void view(Que **q);
 	void view_s(Que **q, char* fam);
 	void del(Que **pbeg);
-
+private:
 	int price;
 	char familia[100];
 	char model[50];
@@ -235,7 +235,7 @@ public:
 	void del_f(Deque **pbeg, Deque **ends);
 	void view(Deque **q);
 	void search(Deque **q, char* fam);
-
+private:
 	int price;
 	char familia[100];
 	char model[50];
